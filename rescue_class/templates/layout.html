@@ -1,0 +1,34 @@
+{% extends 'base.html' %} {% block body %}
+<!-- Static navbar -->
+<nav class="navbar navbar-default navbar-inverse navbar-static-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+                aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">Rescue Class</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                {% for ni in ['index'] %}
+                <li {%- if request.path==url_for(ni) %} class="active" {% endif %}><a href="{{ url_for(ni) }}">{{ ni | capitalize }}</a></li>
+                {% endfor %}
+            </ul>
+            <p class="nav navbar-nav navbar-right navbar-text">
+                {% if current_user and current_user.is_authenticated %}logged in as <strong>{{ current_user.username }}</strong>                - <a href="{{ url_for('logout') }}">log out</a>{% else %}<a href="{{ url_for('login') }}">log in</a>{%
+                endif %}
+            </p>
+        </div>
+        <!--/.nav-collapse -->
+    </div>
+</nav>
+
+
+<div class="container">
+    {% block content %}{% endblock %}
+</div>
+{% endblock %}
