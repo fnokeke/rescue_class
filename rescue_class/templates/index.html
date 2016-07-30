@@ -6,6 +6,9 @@
 
     {% if current_user.is_authenticated() %}
     <h3>Welcome, {{current_user.firstname}}</h3>
+    <div>
+      <p>This site allows you to view aggregated RescueTime logs.</p>
+    </div>
 
     {% if not session.get('rescuetime_credentials') %}
     <input type="button" id="rescuetime-btn" value="Connect RescueTime"/>
@@ -13,13 +16,18 @@
 
     {% endif %}
 
-    <div>
-      <p>This site allows you to view aggregated RescueTime logs.</p>
-    </div>
-
     {% if not current_user.is_authenticated() %}
-    <h3> Sign In </h3>
-    <button type="button" name="login-btn" id="login-btn">Signin with Google</button>
+    <h3> Rescue Class Research </h3>
+    <p>
+      Rescue Class is a research project that uses RescueTime to track student activities during course assigments.
+      The goal is to provide personalized feedback to students and de-identified aggregated reports to instructors.
+    </p>
+    <img src="{{ url_for('static', filename='google_btn_normal.png') }}"
+    onmouseover="this.src='{{ url_for('static', filename='google_btn_normal.png') }}';"
+    onmouseout="this.src='{{ url_for('static', filename='google_btn_hover.png') }}';"
+    onclick="this.src='{{ url_for('static', filename='google_btn_hover.png') }}';"
+    name="login-btn" id="login-btn" alt="Sign in button"/>
+
     {% endif %}
 
 {% endblock %}
