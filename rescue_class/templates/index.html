@@ -3,8 +3,23 @@
 {% block title %} Home {% endblock %}
 
 {% block content %}
+
+    {% if current_user.is_authenticated() %}
+    <h3>Welcome, {{current_user.firstname}}</h3>
+
+    {% if not session.get('rescuetime_credentials') %}
+    <input type="button" id="rescuetime-btn" value="Connect RescueTime"/>
+    {% endif %}
+
+    {% endif %}
+
     <div>
-      <h3>Welcome</h3>
-        <p>This site allows you to view aggregated RescueTime logs.</p>
+      <p>This site allows you to view aggregated RescueTime logs.</p>
     </div>
+
+    {% if not current_user.is_authenticated() %}
+    <h3> Sign In </h3>
+    <button type="button" name="login-btn" id="login-btn">Signin with Google</button>
+    {% endif %}
+
 {% endblock %}

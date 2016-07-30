@@ -3,8 +3,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from rescue_class import app
 
-
-
 db = SQLAlchemy(app)
 
 
@@ -32,26 +30,13 @@ class User(db.Model):
         return True
 
     def is_authenticated(self):
-        """
-        Returns `True`. User is always authenticated. Herp Derp.
-        """
         return True
 
     def is_anonymous(self):
-        """
-        Returns `False`. There are no Anonymous here.
-        """
         return False
 
     def get_id(self):
-        """
-        Assuming that the user object has an `id` attribute, this will take
-        that and convert it to `unicode`.
-        """
-        try:
-            return unicode(self.email)
-        except AttributeError:
-            raise NotImplementedError("No `id` attribute - override get_id")
+        return unicode(self.email)
 
     def get_field(self, key):
         return getattr(self, key) # same: self.key
@@ -67,8 +52,6 @@ class User(db.Model):
 ###############################################################################
 def create_user(profile):
     email = profile.get('email')
-    user = None
-
     if not User.query.filter_by(email=email).first():
         new_user = User(profile)
         db.session.add(new_user)
@@ -77,8 +60,7 @@ def create_user(profile):
     else:
         print '%s already exists.' % email
 
-    user = User.query.filter_by(email=email).first()
-    return user
+    return User.query.filter_by(email=email).first()
 
 def get_user(user_id):
     return User.query.filter_by(email=user_id).first()

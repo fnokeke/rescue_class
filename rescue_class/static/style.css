@@ -1,1 +1,16 @@
 /* rescue-class style */
+/* preceding all custom css naming with 'm' to avoid any clash with bootstrap */
+
+.mcenter-text {
+    text-align: center;
+    padding: 20px;
+}
+
+.mfooter {
+    margin-top: 1em;
+    margin-bottom: 2em;
+    margin-right: 3em;
+    color: #aaa;
+    font-size: smaller;
+    text-align: right;
+}

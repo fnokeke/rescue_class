@@ -1,8 +1,11 @@
 {% extends 'base.html' %} {% block body %}
-<!-- Static navbar -->
+
 <nav class="navbar navbar-default navbar-inverse navbar-static-top">
+
     <div class="container">
+
         <div class="navbar-header">
+
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false"
                 aria-controls="navbar">
                 <span class="sr-only">Toggle navigation</span>
@@ -11,35 +14,35 @@
                 <span class="icon-bar"></span>
             </button>
             <a class="navbar-brand" href="/">Rescue Class</a>
+
         </div>
+
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
                 {% for ni in ['index', 'dashboard'] %}
                 <li {%- if request.path==url_for(ni) %} class="active" {% endif %}>
-                  {% if ni == 'index' %}
-                    <a href="{{ url_for(ni) }}">Home</a>
-                  {% else %}
-                    <a href="{{ url_for(ni) }}">{{ ni | capitalize }}</a>
-                  {% endif %}
+                    {% if ni == 'index' %}
+                    <a href="{{ url_for(ni) }}">Home</a> {% else %}
+                    <a href="{{ url_for(ni) }}">{{ ni | capitalize }}</a> {% endif %}
                 </li>
                 {% endfor %}
             </ul>
             <p class="nav navbar-nav navbar-right navbar-text">
-                {% if current_user and current_user.is_authenticated %}logged in as <strong>{{ current_user.username }}</strong>
-                    - <a href="{{ url_for('logout') }}">log out</a>{% else %}<a href="{{ url_for('login') }}">log in</a>{%
-                endif %}
+                {% if current_user.is_authenticated() %}
+                <strong>{{ current_user.email }}</strong>&nbsp;&nbsp;
+                <a href="{{ url_for('logout') }}">log out</a> {% endif %}
             </p>
         </div>
-        <!--/.nav-collapse -->
-    </div>
-</nav>
 
+    </div>
+
+</nav>
 
 <div class="container">
     {% block content %}{% endblock %}
 </div>
 
-<footer style="margin-top: 1em; margin-bottom: 2em; margin-right: 3em; color: #aaa; font-size: smaller; text-align: right;">
-  (c) smalldatalab 2016
-</footer>
+<div class="mfooter">
+    (c) smalldatalab 2016
+</div>
 {% endblock %}

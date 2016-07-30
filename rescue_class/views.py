@@ -1,42 +1,22 @@
 # views.py
 from flask import Flask, flash, redirect, url_for, session, render_template, request
 from flask_login import login_user, logout_user, current_user, login_required, LoginManager
+from oauth2client.client import OAuth2WebServerFlow
 
 from oauth2client import client
 from apiclient import discovery
 import httplib2
 
-from rescue_class import app, login_manager
+from rescue_class import app, login_manager, models
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
 @app.route('/dashboard')
+@login_required
 def dashboard():
     return render_template('dashboard.html')
-
-def login():
-    return render_template('login.html')
-
-    user_credentials = session.get('user_credentials')
-    if not user_credentials:
-        return redirect(url_for('oauth2callback'))
-
-    credentials = client.OAuth2Credentials.from_json(user_credentials)
-    if credentials.access_token_expired:
-        print 'Refreshing login access_token because it has expired...'
-        credentials.refresh(httplib2.Http())
-
-    http = credentials.authorize(httplib2.Http())
-    service = discovery.build('oauth2', 'v2', http=http)
-
-    userinfo = service.userinfo().get().execute()
-    user = models.create_user(userinfo)
-
-    login_user(user)
-
-    return render_template('home.html')
 
 @app.route('/oauth2callback')
 def oauth2callback():
@@ -45,15 +25,24 @@ def oauth2callback():
                            scope= app.config['GOOGLE_SCOPE'],
                            redirect_uri=url_for('oauth2callback', _external=True))
 
-    if 'code' not in request.args:
+    auth_code = request.args.get('code')
+    if not auth_code:
         auth_uri = flow.step1_get_authorize_url()
         return redirect(auth_uri)
-    else:
-        auth_code = request.args.get('code')
-        credentials = flow.step2_exchange(auth_code, http=httplib2.Http())
-        credentials_json = credentials.to_json()
-        session['user_credentials'] = credentials_json
-        return redirect(url_for('login'))
+
+    credentials = flow.step2_exchange(auth_code, http=httplib2.Http())
+    if credentials.access_token_expired:
+        credentials.refresh(httplib2.Http())
+
+    http = credentials.authorize(httplib2.Http())
+    service = discovery.build('oauth2', 'v2', http=http)
+
+    userinfo = service.userinfo().get().execute()
+    user = models.create_user(userinfo)
+    login_user(user)
+
+    return redirect(url_for('index'))
+
 
 @app.route('/rescueOauth2Callback')
 def rescueOauth2Callback():
@@ -117,12 +106,6 @@ def rescueOauth2Callback():
 @login_manager.user_loader
 def user_loader(user_id):
     return models.get_user(user_id)
-
-
-@login_manager.unauthorized_handler
-def unauthorized():
-    return '<h2>Sorry, gotta sign in first...<br>' + \
-           '<a href="%s">Sign in</a></h2>' % url_for('index')
 
 
 @app.route("/logout")
