@@ -52,7 +52,9 @@
        {% block body %}{% endblock %}
 
        <!-- scripts go here to load at the end -->
-       {% block script %}{% endblock %}
+       {% block script %}
+       <script type="text/javascript" src="{{ url_for('static', filename='rescue.js') }}"></script>
+       {% endblock %}
    </body>
 
 </html>
