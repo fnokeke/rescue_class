@@ -1,14 +1,20 @@
+
 var rescue_class = function() {
 
     // #################################################
     // buttons
     // #################################################
     $('#login-btn').click(function() {
-        window.location.href = '/oauth2callback';
+        window.location.href = window.location.hostname ==='localhost'
+                                  ? 'oauth2callback'
+                                  : '/rtime/oauth2callback';
     });
 
     $('#rescuetime-btn').click(function() {
-        window.location.href = '/rescueOauth2Callback';
+      //  TODO: check if you can use url_for syntax in javascript
+        window.location.href = window.location.hostname ==='localhost'
+                                  ? 'rescueOauth2Callback'
+                                  : '/rtime/rescueOauth2Callback';
     });
 
 

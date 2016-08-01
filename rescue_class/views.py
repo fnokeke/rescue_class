@@ -44,8 +44,86 @@ def oauth2callback():
     return redirect(url_for('index'))
 
 
+class RescueOauth2:
+
+    APP_ID = 'de68608c52e71e5f3669b53afdf1e26a1d460bb83f0ac736382c525b2e5dbe37'
+    APP_SECRET = '4a8a8623c5a650e63562ec971f9d8e968280853bc92334e8f81591f6c74b4635'
+    BASE_URL = 'https://www.rescuetime.com/oauth/authorize?client_id=de68608c52e71e5f3669b53afdf1e26a1d460bb83f0ac736382c525b2e5dbe37'
+
+    def __init__(self, scope=None, redirect_url=None):
+        self.scope = scope or 'time_data focustime_data'
+        self.redirect_url = redirect_url or 'https://slm.smalldata.io/rescueOauth2Callback'
+        self.auth_url = '%(base_url)s&redirect_uri=%(redirect_url)s&response_type=code&scope=%(scope)s' % {
+                            'base_url': self.BASE_URL,
+                            'redirect_url': self.redirect_url   ,
+                            'scope': self.scope
+                         }
+
+        self.flow = OAuth2WebServerFlow(
+                           client_id = self.APP_ID,
+                           client_secret = self.APP_SECRET,
+                           scope = self.scope,
+                           redirect_uri = url_for('rescueOauth2Callback', _external=True))
+
+
+    def fetch_token(self, user, code):
+        if not code:
+            raise ValueError("Invalid request code in set_access_token")
+
+        url = 'https://www.rescuetime.com/oauth/token'
+        data = {
+            'client_id': self.APP_ID,
+            'client_secret': self.APP_SECRET,
+            'code': code,
+            'grant_type': 'authorization_code',
+            'redirect_uri': self.redirect_url
+        }
+
+        r = requests.post(url, data=data)
+        if r.status_code == 200:
+            results = json.loads(r.text)
+            self.token = results('access_token')
+            user.update_field('rescuetime_access_token', self.token)
+
+        return r.status_code, r.text
+
+
+    def fetch_daily_summary(self):
+        url = 'https://www.rescuetime.com/api/oauth/daily_summary_feed'
+        params = {'access_token': self.token}
+        r = requests.get(url, params=params)
+        return r.status_code, r.text
+
+
 @app.route('/rescueOauth2Callback')
 def rescueOauth2Callback():
+    if 'error' in request.args:
+        flash('Sorry user did not grant authentication :(', 'error')
+        return redirect(url_for('home'))
+
+    rt = RescueOauth2()
+    if 'code' not in request.args:
+        return redirect(rt.auth_url)
+
+    code = request.args.get('code')
+    status, result = rt.fetch_token(current_user, code)
+    print 'fetch token response:', status, response
+    if status != 200:
+        flash('RescueTime Error: ' + result, 'error')
+    else:
+        status, result = rt.fetch_daily_summary()
+        print 'fetch token response:', status, response
+        category = 'success' if status == 200 else 'error'
+        flash('RescueTime result: %s' % result[:100], category)
+
+    return redirect(url_for('home'))
+
+
+
+
+
+@app.route('/rescueOauth2Callback')
+def rescueOauth2Callback2():
 
     if 'error' in request.args:
         flash('Sorry user did not grant authentication :(', 'error')
