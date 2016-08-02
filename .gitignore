@@ -1,3 +1,4 @@
 *.pyc
 .env
 secret_keys.py
+.DS_Store
