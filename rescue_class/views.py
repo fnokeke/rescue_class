@@ -52,7 +52,7 @@ class RescueOauth2:
 
     def __init__(self, scope=None, redirect_url=None):
         self.scope = scope or 'time_data focustime_data'
-        self.redirect_url = redirect_url or 'https://slm.smalldata.io/rescueOauth2Callback'
+        self.redirect_url = redirect_url or 'https://rtime.smalldata.io/rescueOauth2Callback'
         self.auth_url = '%(base_url)s&redirect_uri=%(redirect_url)s&response_type=code&scope=%(scope)s' % {
                             'base_url': self.BASE_URL,
                             'redirect_url': self.redirect_url   ,
@@ -133,7 +133,7 @@ def rescueOauth2Callback2():
     APP_SECRET = '4a8a8623c5a650e63562ec971f9d8e968280853bc92334e8f81591f6c74b4635'
     SCOPE = 'time_data focustime_data'
     BASE_URL = 'https://www.rescuetime.com/oauth/authorize?client_id=de68608c52e71e5f3669b53afdf1e26a1d460bb83f0ac736382c525b2e5dbe37'
-    REDIRECT_URL = 'https://slm.smalldata.io/rescueOauth2Callback'
+    REDIRECT_URL = 'https://rtime.smalldata.io/rescueOauth2Callback'
     AUTH_URL = '%(base_url)s&redirect_uri=%(redirect_url)s&response_type=code&scope=%(scope)s' % {
                     'base_url': BASE_URL,
                     'redirect_url': REDIRECT_URL,
@@ -159,7 +159,7 @@ def rescueOauth2Callback2():
             'client_secret': APP_SECRET,
             'code': auth_code,
             'grant_type': 'authorization_code',
-            'redirect_uri': 'https://slm.smalldata.io/rescueOauth2Callback'
+            'redirect_uri': 'https://rtime.smalldata.io/rescueOauth2Callback'
         }
 
         r = requests.post(url, data=data)
