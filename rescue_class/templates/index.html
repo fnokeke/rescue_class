@@ -6,12 +6,15 @@
 
     {% if current_user.is_authenticated() %}
     <h3>Welcome, {{current_user.firstname}}</h3>
+
+    {% if not current_user.access_token %}
     <div>
       <p>This site allows you to view aggregated RescueTime logs.</p>
     </div>
-
-    {% if not session.get('rescuetime_credentials') %}
     <input type="button" id="rescuetime-btn" value="Connect RescueTime"/>
+    {% else %}
+    <i> Your RescueTime account has been connected. </i>
+    Go to dashboard to see your data.
     {% endif %}
 
     {% endif %}

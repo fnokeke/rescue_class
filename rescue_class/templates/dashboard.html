@@ -21,7 +21,10 @@
 <table id="users-table" class="table table-striped" style="margin-top: 1em;">
     <thead>
         <tr>
+            <th>No </th>
             <th>Email</th>
+            <th>Access Token</th>
+            <th>Productivity</th>
         </tr>
     </thead>
 
@@ -30,6 +33,49 @@
             <tr>
                 <td>{{ loop.index }}</td>
                 <td>{{ user.email }}</td>
+                <td>{{ user.access_token }}</td>
+                <td>
+                  <ul>
+
+                    <li>
+                      <b>
+                   All Productive Hours:
+                      </b>
+                   {{ results[0]['all_productive_hours'] }}
+                    </li>
+
+                    <li>
+                      <b>
+                   Very Productive Hours:
+                      </b>
+                   {{ results[0]['very_productive_hours'] }}
+                    </li>
+
+                    <li>
+                      <b>
+                   Neutral Hours:
+                      </b>
+                   {{ results[0]['neutral_hours'] }}
+                    </li>
+
+                    <li>
+                      <b>
+                   All Distracting Hours:
+                      </b>
+                   {{ results[0]['all_distracting_hours'] }}
+                    </li>
+
+                    <li>
+                      <b>
+                   Very Distracting Hours:
+                      </b>
+                   {{ results[0]['very_distracting_hours'] }}
+                    </li>
+
+                  </ul>
+                  Remaining:
+                  {{results[0]}}
+                </td>
             </tr>
         {% endfor %}
     </tbody>
