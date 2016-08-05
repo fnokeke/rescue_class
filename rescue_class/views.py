@@ -5,7 +5,9 @@ from oauth2client.client import OAuth2WebServerFlow
 
 from oauth2client import client
 from apiclient import discovery
+
 import httplib2
+import requests
 
 from rescue_class import app, login_manager, models
 
@@ -52,7 +54,7 @@ class RescueOauth2:
 
     def __init__(self, scope=None, redirect_url=None):
         self.scope = scope or 'time_data focustime_data'
-        self.redirect_url = redirect_url or 'https://rtime.smalldata.io/rescueOauth2Callback'
+        self.redirect_url = redirect_url or url_for('rescueOauth2Callback', _external=True)
         self.auth_url = '%(base_url)s&redirect_uri=%(redirect_url)s&response_type=code&scope=%(scope)s' % {
                             'base_url': self.BASE_URL,
                             'redirect_url': self.redirect_url   ,
@@ -63,7 +65,7 @@ class RescueOauth2:
                            client_id = self.APP_ID,
                            client_secret = self.APP_SECRET,
                            scope = self.scope,
-                           redirect_uri = url_for('rescueOauth2Callback', _external=True))
+                           redirect_uri = self.redirect_url)
 
 
     def fetch_token(self, user, code):
@@ -122,63 +124,63 @@ def rescueOauth2Callback():
 
 
 
-@app.route('/rescueOauth2Callback')
-def rescueOauth2Callback2():
-
-    if 'error' in request.args:
-        flash('Sorry user did not grant authentication :(', 'error')
-        return redirect(url_for('home'))
-
-    APP_ID = 'de68608c52e71e5f3669b53afdf1e26a1d460bb83f0ac736382c525b2e5dbe37'
-    APP_SECRET = '4a8a8623c5a650e63562ec971f9d8e968280853bc92334e8f81591f6c74b4635'
-    SCOPE = 'time_data focustime_data'
-    BASE_URL = 'https://www.rescuetime.com/oauth/authorize?client_id=de68608c52e71e5f3669b53afdf1e26a1d460bb83f0ac736382c525b2e5dbe37'
-    REDIRECT_URL = 'https://rtime.smalldata.io/rescueOauth2Callback'
-    AUTH_URL = '%(base_url)s&redirect_uri=%(redirect_url)s&response_type=code&scope=%(scope)s' % {
-                    'base_url': BASE_URL,
-                    'redirect_url': REDIRECT_URL,
-                    'scope': SCOPE
-                }
-
-    flow = OAuth2WebServerFlow(
-                           client_id = APP_ID,
-                           client_secret = APP_SECRET,
-                           scope = SCOPE,
-                           redirect_uri = url_for('rescueOauth2Callback', _external=True))
-
-    if 'code' not in request.args:
-        return redirect(AUTH_URL)
-    else:
-        auth_code = request.args.get('code')
-        print 'auth_code: %s' % auth_code
-
-
-        url = 'https://www.rescuetime.com/oauth/token'
-        data = {
-            'client_id': APP_ID,
-            'client_secret': APP_SECRET,
-            'code': auth_code,
-            'grant_type': 'authorization_code',
-            'redirect_uri': 'https://rtime.smalldata.io/rescueOauth2Callback'
-        }
-
-        r = requests.post(url, data=data)
-        print 'r.status_code: %s' % r.status_code
-        print 'r.text: %s' % r.text
-
-        if r.status_code != 200:
-            flash('RescueTime Error: ' + r.text, 'error')
-        else:
-            results = json.loads(r.text)
-            current_user.update_field('rescuetime_access_token', results['access_token'])
-
-            # fetch sample data
-            url = 'https://www.rescuetime.com/api/oauth/daily_summary_feed'
-            params = {'access_token': results['access_token']}
-            r = requests.get(url, params=params)
-            flash('RescueTime result: %s' % r.text[:100], 'success')
-        return redirect(url_for('home'))
-
+# @app.route('/rescueOauth2Callback2')
+# def rescueOauth2Callback2():
+#
+#     if 'error' in request.args:
+#         flash('Sorry user did not grant authentication :(', 'error')
+#         return redirect(url_for('home'))
+#
+#     APP_ID = 'de68608c52e71e5f3669b53afdf1e26a1d460bb83f0ac736382c525b2e5dbe37'
+#     APP_SECRET = '4a8a8623c5a650e63562ec971f9d8e968280853bc92334e8f81591f6c74b4635'
+#     SCOPE = 'time_data focustime_data'
+#     BASE_URL = 'https://www.rescuetime.com/oauth/authorize?client_id=de68608c52e71e5f3669b53afdf1e26a1d460bb83f0ac736382c525b2e5dbe37'
+#     REDIRECT_URL = 'https://rtime.smalldata.io/rescueOauth2Callback'
+#     AUTH_URL = '%(base_url)s&redirect_uri=%(redirect_url)s&response_type=code&scope=%(scope)s' % {
+#                     'base_url': BASE_URL,
+#                     'redirect_url': REDIRECT_URL,
+#                     'scope': SCOPE
+#                 }
+#
+#     flow = OAuth2WebServerFlow(
+#                            client_id = APP_ID,
+#                            client_secret = APP_SECRET,
+#                            scope = SCOPE,
+#                            redirect_uri = url_for('rescueOauth2Callback', _external=True))
+#
+#     if 'code' not in request.args:
+#         return redirect(AUTH_URL)
+#     else:
+#         auth_code = request.args.get('code')
+#         print 'auth_code: %s' % auth_code
+#
+#
+#         url = 'https://www.rescuetime.com/oauth/token'
+#         data = {
+#             'client_id': APP_ID,
+#             'client_secret': APP_SECRET,
+#             'code': auth_code,
+#             'grant_type': 'authorization_code',
+#             'redirect_uri': url_for('rescueOauth2Callback', _external=True))
+#         }
+#
+#         r = requests.post(url, data=data)
+#         print 'r.status_code: %s' % r.status_code
+#         print 'r.text: %s' % r.text
+#
+#         if r.status_code != 200:
+#             flash('RescueTime Error: ' + r.text, 'error')
+#         else:
+#             results = json.loads(r.text)
+#             current_user.update_field('rescuetime_access_token', results['access_token'])
+#
+#             # fetch sample data
+#             url = 'https://www.rescuetime.com/api/oauth/daily_summary_feed'
+#             params = {'access_token': results['access_token']}
+#             r = requests.get(url, params=params)
+#             flash('RescueTime result: %s' % r.text[:100], 'success')
+#         return redirect(url_for('home'))
+#
 
 
 @login_manager.user_loader

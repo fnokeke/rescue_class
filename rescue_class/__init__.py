@@ -3,6 +3,7 @@ from flask_login import LoginManager
 
 
 from rescue_class.utils import ReverseProxied
+import requests
 
 
 app = Flask(__name__)
